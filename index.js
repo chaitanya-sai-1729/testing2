@@ -17,7 +17,7 @@ client.connect();
 app.post("/stock",async(req,res)=>{
     var stock = req.body.stock;
     var array=stock.split(',');
-    const nod = parseInt(sarray[0]);
+    const nod = parseInt(array[0]);
     const nof = parseInt(array[1]);
     const nom = parseInt(array[2]);
     const buffer = parseInt(req.body.buffer);
