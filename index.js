@@ -15,9 +15,11 @@ client.connect();
 
 
 app.post("/stock",async(req,res)=>{
-    const nod = req.body.nod;
-    const nof = req.body.nof;
-    const nom = req.body.nom;
+    var stock = req.body.stock;
+    var array=stock.split(',');
+    const nod = array[0];
+    const nof = array[1];
+    const nom = array[2];
     const buffer = req.body.buffer;
     
     const collection = client.db().collection("inventory");
