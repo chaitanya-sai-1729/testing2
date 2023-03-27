@@ -56,7 +56,7 @@ app.post("/stock", async (req, res) => {
 
 app.get("/stock", async (req, res) => {
 	const collection = client.db().collection("inventory");
-	const findResult = await collection.find({}).toArray();
+	const findResult = await collection.findOne();
 	res.send(findResult);
 });
 
