@@ -9,6 +9,7 @@ const io = new Server(server, {
 	cors: {
 		origin: "*",
 	},
+	path: "/api",
 });
 
 app.use(cors({ origin: "*" }));
