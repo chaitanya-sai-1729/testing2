@@ -1,15 +1,14 @@
-const express = require("express");
-const bodyParser = require("body-parser");
+import express from 'express';
+import bodyParser from 'body-parser';
 const app = express();
-const cors = require("cors");
-const http = require("http");
-const server = http.createServer(app);
-const { Server } = require("socket.io");
+import cors from 'cors';
+import { createServer } from 'http';
+const server = createServer(app);
+import { Server } from 'socket.io';
 const io = new Server(server, {
 	cors: {
 		origin: "*",
 	},
-	path: "/api",
 });
 
 app.use(cors({ origin: "*" }));
@@ -26,7 +25,7 @@ const client = new MongoClient(uri, {
 });
 client.connect();
 
-app.post("/stock", async (req, res) => {
+app.post("/stock", async (req: any, res: any) => {
 	var stock = req.body.stock;
 	var array = stock.split(",");
 	const nod = parseInt(array[0]);
@@ -57,7 +56,7 @@ app.post("/stock", async (req, res) => {
 	}
 });
 
-app.get("/stock", async (req, res) => {
+app.get("/stock", async (_: any, res: any) => {
 	const collection = client.db().collection("inventory");
 	const findResult = await collection.findOne();
 	res.send({
@@ -65,7 +64,7 @@ app.get("/stock", async (req, res) => {
 	});
 });
 
-app.post("/stage1", async (req, res) => {
+app.post("/stage1", async (req: any, res: any) => {
 	const _id = req.body.rfid;
 
 	const collection = client.db().collection("product");
@@ -79,7 +78,7 @@ app.post("/stage1", async (req, res) => {
 	}
 });
 
-app.post("/stage2", async (req, res) => {
+app.post("/stage2", async (req: any, res: any) => {
 	const rfid = req.body.rfid;
 
 	const collection = client.db().collection("product");
@@ -96,7 +95,7 @@ app.post("/stage2", async (req, res) => {
 	}
 });
 
-app.post("/stage3", async (req, res) => {
+app.post("/stage3", async (req: any, res: any) => {
 	const rfid = req.body.rfid;
 
 	const collection = client.db().collection("product");
@@ -113,12 +112,10 @@ app.post("/stage3", async (req, res) => {
 	}
 });
 
-app.post("/orders", async (req, res) => {
+app.post("/orders", async (req: any, res: any) => {
 	const d = req.body.drones;
-	const m = req.body.motors;
-	const f = req.body.frames;
 	console.log(req.body);
-	collection = client.db().collection("product");
+	const collection = client.db().collection("product");
 	const a = await collection.find({ stage_3: 1 }).toArray();
 
 	if (a.length < d) {
@@ -135,7 +132,7 @@ app.post("/orders", async (req, res) => {
 	}
 });
 
-app.get("/number", async (req, res) => {
+app.get("/number", async (_: any, res: any) => {
 	const collection = client.db().collection("product");
 
 	try {
@@ -154,9 +151,8 @@ app.get("/number", async (req, res) => {
 });
 
 // Sockets
-io.on("connection", (socket) => {
-	globalSocket = socket;
-	socket.on("chat message", (msg) => {
+io.on("connection", (socket: any) => {
+	socket.on("chat message", (msg: any) => {
 		console.log("message: " + msg);
 	});
 });
