@@ -108,6 +108,27 @@ app.post("/stage3", async (req, res) => {
 	}
 });
 
+app.post("/orders",async(req,res)=>{
+    const d=req.body.drones;
+    const m=req.body.motors;
+    const f=req.body.frames;
+    console.log(req.body);
+    collection = client.db().collection("product");
+    const a=await collection.find({stage_3:1}).toArray();
+
+    if(a.length<d){
+        console.log(a);
+        res.send({message:"out of stock"});
+    }else{
+        for(let i=0;i<d;i++){
+            await collection.updateOne({_id:a[i]._id},{$set:{"stage_4":1,"stage_3":0}});
+        }
+        res.send({message:"order successfull"})
+    }
+    
+})
+
+
 app.get("/number", async (req, res) => {
 	const collection = client.db().collection("product");
 
