@@ -32,10 +32,22 @@ app.post("/stock", async (req, res) => {
 	const buffer = parseInt(req.body.buffer);
 
 	const collection = client.db().collection("inventory");
+	const document = await collection.findOne();
 
 	try {
-		await collection.insertOne({ nod: nod, nof: nof, nom: nom, buffer: buffer });
-		io.emit("stock", nod, nof, nom);
+		if (
+			document &&
+			(document.nod !== nod || document.nof !== nof || document.nom !== nom)
+		) {
+			await collection.findOneAndUpdate(
+				{ _id: document._id },
+				{ $set: { nod: nod, nof: nof, nom: nom, buffer: buffer } }
+			);
+			io.emit("stock", nod, nof, nom);
+		} else {
+			await collection.insertOne({ nod, nof, nom, buffer });
+			io.emit("stock", nod, nof, nom);
+		}
 		res.send("Successfully Posted");
 	} catch (e) {
 		console.log(e);
