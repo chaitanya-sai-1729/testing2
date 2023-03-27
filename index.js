@@ -5,7 +5,7 @@ const cors = require("cors");
 const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const io = new Server(server);
+const io = new Server(server, { perMessageDeflate: false });
 
 app.use(cors());
 app.use(express.json());
@@ -20,8 +20,6 @@ const client = new MongoClient(uri, {
 	serverApi: ServerApiVersion.v1,
 });
 client.connect();
-
-let globalSocket;
 
 app.post("/stock", async (req, res) => {
 	var stock = req.body.stock;
@@ -110,26 +108,27 @@ app.post("/stage3", async (req, res) => {
 	}
 });
 
-app.post("/orders",async(req,res)=>{
-    const d=req.body.drones;
-    const m=req.body.motors;
-    const f=req.body.frames;
-    console.log(req.body);
-    collection = client.db().collection("product");
-    const a=await collection.find({stage_3:1}).toArray();
+app.post("/orders", async (req, res) => {
+	const d = req.body.drones;
+	const m = req.body.motors;
+	const f = req.body.frames;
+	console.log(req.body);
+	collection = client.db().collection("product");
+	const a = await collection.find({ stage_3: 1 }).toArray();
 
-    if(a.length<d){
-        console.log(a);
-        res.send({message:"out of stock"});
-    }else{
-        for(let i=0;i<d;i++){
-            await collection.updateOne({_id:a[i]._id},{$set:{"stage_4":1,"stage_3":0}});
-        }
-        res.send({message:"order successfull"})
-    }
-    
-})
-
+	if (a.length < d) {
+		console.log(a);
+		res.send({ message: "out of stock" });
+	} else {
+		for (let i = 0; i < d; i++) {
+			await collection.updateOne(
+				{ _id: a[i]._id },
+				{ $set: { stage_4: 1, stage_3: 0 } }
+			);
+		}
+		res.send({ message: "order successfull" });
+	}
+});
 
 app.get("/number", async (req, res) => {
 	const collection = client.db().collection("product");
