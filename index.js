@@ -21,6 +21,8 @@ const client = new MongoClient(uri, {
 });
 client.connect();
 
+let globalSocket;
+
 app.post("/stock", async (req, res) => {
 	var stock = req.body.stock;
 	var array = stock.split(",");
@@ -33,7 +35,8 @@ app.post("/stock", async (req, res) => {
 
 	try {
 		await collection.insertOne({ nod: nod, nof: nof, nom: nom, buffer: buffer });
-		res.send("Succesfully Posted");
+		io.emit("stock", nod, nof, nom);
+		res.send("Successfully Posted");
 	} catch (e) {
 		console.log(e);
 	}
@@ -52,7 +55,8 @@ app.post("/stage1", async (req, res) => {
 
 	try {
 		await collection.insertOne({ _id: _id, stage_1: 1, stage_2: 0, stage_3: 0 });
-		res.send("Succesfully posted");
+		io.emit("stage1");
+		res.send("Successfully posted");
 	} catch (e) {
 		console.log(e);
 	}
@@ -68,7 +72,8 @@ app.post("/stage2", async (req, res) => {
 			{ _id: rfid },
 			{ $set: { stage_1: 0, stage_2: 1, stage_3: 0 } }
 		);
-		res.send("Succesfully posted");
+		io.emit("stage2");
+		res.send("Successfully posted");
 	} catch (e) {
 		console.log(e);
 	}
@@ -84,7 +89,8 @@ app.post("/stage3", async (req, res) => {
 			{ _id: rfid },
 			{ $set: { stage_1: 0, stage_2: 0, stage_3: 1 } }
 		);
-		res.send("Succesfully posted");
+		io.emit("stage3");
+		res.send("Successfully posted");
 	} catch (e) {
 		console.log(e);
 	}
@@ -110,6 +116,7 @@ app.get("/number", async (req, res) => {
 
 // Sockets
 io.on("connection", (socket) => {
+	globalSocket = socket;
 	socket.on("chat message", (msg) => {
 		console.log("message: " + msg);
 	});
